@@ -1,55 +1,35 @@
-# 🧠 Sentiment Analysis using Deep Learning
+## Hotel Review Sentiment Analysis (Simple)
 
-This project implements a sentiment analysis system using deep learning techniques to classify textual data (e.g., movie reviews or tweets) as **positive**, **negative**, or **neutral**.
+This project trains a sentiment classifier (Negative/Neutral/Positive) on hotel reviews using scikit-learn, and provides a small Streamlit app to predict sentiment for a single review.
 
-It uses a trained neural network model built using **TensorFlow** and **Keras**, and includes steps for preprocessing, tokenization, model training, and evaluation.
-
----
-
-## 🚀 Features
-
-- Preprocesses raw text data using tokenization and padding
-- Trains a neural network (e.g., LSTM or Dense layers) on labeled sentiment data
-- Predicts sentiment from user input or batch text
-- Visualizes model accuracy and loss during training
-- Easily extendable to any custom dataset
-
----
-
-## 🛠️ Tech Stack
-
-- 🐍 Python 3
-- 🧠 TensorFlow / Keras
-- 📊 Matplotlib, Seaborn
-- 🔠 NLTK / spaCy (optional for preprocessing)
-- 📄 Jupyter Notebook or Python scripts
-
----
-
-**📦 Example Output**
+### Setup
 ```bash
-Input: "I really enjoyed this movie!"
-Predicted Sentiment: Positive 😊
-
-Input: "Terrible customer service."
-Predicted Sentiment: Negative 😠
+pip install -r requirements.txt
 ```
 
-**🔄 Future Improvements**
+### Train (creates model + reports)
 ```bash
-Use pre-trained word embeddings like GloVe or BERT
-
-Build a Flask/Streamlit web app interface
-
-Extend to multi-language support
-
-Add sentiment scoring (e.g., 1 to 5 scale)
+python3 train.py
 ```
-**🙌 Author**
+- Model saved to `artifacts/hotel_sentiment_pipeline.joblib`
+- Reports saved to `reports/` (classification report, confusion matrix)
+
+### Run the app (single text input)
 ```bash
-Aditya Mahendra Patil – GitHub Profile
+streamlit run app.py
 ```
-**📃 License**
-```bash
-This project is open-source under the MIT License. See the LICENSE file for more info.
-```
+
+### Files
+- `train.py` — trains and evaluates the model
+- `app.py` — Streamlit app for single review prediction
+- `hotel_reviews.csv` — data (needs columns: `Review`, `Rating`)
+- `reports/` — evaluation outputs
+- `artifacts/` — saved model
+- `requirements.txt` — dependencies
+
+### Label mapping
+- Ratings 1–2 → Negative
+- Rating 3 → Neutral
+- Ratings 4–5 → Positive
+
+
