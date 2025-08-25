@@ -1,0 +1,10 @@
+pandas
+numpy
+nltk
+scikit-learn
+joblib
+streamlit
+keras>=3.0.0
+tensorflow; platform_system != "Darwin"
+tensorflow-macos; platform_system == "Darwin"
+tensorflow-metal; platform_system == "Darwin"
