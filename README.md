@@ -1,4 +1,4 @@
-## Hotel Review Sentiment Analysis (Simple)
+## Hotel Review Sentiment Analysis 
 
 This project trains a sentiment classifier (Negative/Neutral/Positive) on hotel reviews using scikit-learn, and provides a small Streamlit app to predict sentiment for a single review.
 
@@ -16,7 +16,7 @@ python3 train.py
 
 ### Run the app (single text input)
 ```bash
-streamlit run app.py
+python3 -m streamlit run app.py
 ```
 
 ### Files
