@@ -50,6 +50,8 @@ def prepare_dataset(df: pd.DataFrame, tokenizer: AutoTokenizer):
         return batch
 
     dataset = dataset.map(map_labels, batched=True)
+    # Ensure label column is a ClassLabel for stratified splitting support
+    dataset = dataset.class_encode_column("label")
     dataset = dataset.map(tokenize_fn, batched=True, remove_columns=["Review", "Sentiment"])
 
     return dataset, label2id, id2label
@@ -92,11 +94,13 @@ def save_eval_reports(y_true, y_pred, id2label):
     np.savetxt(os.path.join("reports", "confusion_matrix.csv"), cm, fmt="%d", delimiter=",")
 
 
-def train_distilbert(csv_path: str = "hotel_reviews.csv", model_name: str = "distilbert-base-uncased", output_dir: str = "artifacts/hf_model", epochs: int = 3, batch_size: int = 16, lr: float = 2e-5, weight_decay: float = 0.01, seed: int = 42):
+def train_distilbert(csv_path: str = "hotel_reviews.csv", model_name: str = "distilbert-base-uncased", output_dir: str = "artifacts/hf_model", epochs: int = 3, batch_size: int = 16, lr: float = 2e-5, weight_decay: float = 0.01, seed: int = 42, device: str = "cpu", sample_n: int = 0, grad_accum: int = 1, num_workers: int = 0):
     ensure_dirs()
     tokenizer = AutoTokenizer.from_pretrained(model_name)
 
     df = load_dataframe(csv_path)
+    if sample_n and 0 < sample_n < len(df):
+        df = df.sample(n=sample_n, random_state=seed).reset_index(drop=True)
     dataset, label2id, id2label = prepare_dataset(df, tokenizer)
     train_ds, test_ds = split_dataset(dataset, test_size=0.2, seed=seed)
 
@@ -114,6 +118,7 @@ def train_distilbert(csv_path: str = "hotel_reviews.csv", model_name: str = "dis
         num_train_epochs=epochs,
         per_device_train_batch_size=batch_size,
         per_device_eval_batch_size=batch_size,
+        gradient_accumulation_steps=grad_accum,
         learning_rate=lr,
         weight_decay=weight_decay,
         evaluation_strategy="epoch",
@@ -124,6 +129,12 @@ def train_distilbert(csv_path: str = "hotel_reviews.csv", model_name: str = "dis
         seed=seed,
         logging_steps=50,
         report_to=[],
+        no_cuda=(device == "cpu"),
+        use_mps_device=(device == "mps"),
+        dataloader_pin_memory=False,
+        dataloader_num_workers=num_workers,
+        fp16=False,
+        bf16=False,
     )
 
     trainer = Trainer(
@@ -161,6 +172,10 @@ if __name__ == "__main__":
     parser.add_argument("--batch-size", type=int, default=16)
     parser.add_argument("--lr", type=float, default=2e-5)
     parser.add_argument("--weight-decay", type=float, default=0.01)
+    parser.add_argument("--device", choices=["cpu", "mps"], default="cpu")
+    parser.add_argument("--sample-n", type=int, default=0)
+    parser.add_argument("--grad-accum", type=int, default=1)
+    parser.add_argument("--num-workers", type=int, default=0)
     args = parser.parse_args()
 
     train_distilbert(
@@ -170,6 +185,10 @@ if __name__ == "__main__":
         batch_size=args.batch_size,
         lr=args.lr,
         weight_decay=args.weight_decay,
+        device=args.device,
+        sample_n=args.sample_n,
+        grad_accum=args.grad_accum,
+        num_workers=args.num_workers,
     )
 
 
