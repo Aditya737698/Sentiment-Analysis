@@ -125,4 +125,4 @@ if st.button('Predict Sentiment:'):
 
 
 # %%
-!ipynb-py-convert hotel_reviewAnalysis.ipynb hotelReviewAnalysis.py
+#!ipynb-py-convert hotel_reviewAnalysis.ipynb hotelReviewAnalysis.py
