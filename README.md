@@ -14,14 +14,23 @@ python3 train.py
 - Model saved to `artifacts/hotel_sentiment_pipeline.joblib`
 - Reports saved to `reports/` (classification report, confusion matrix)
 
+### Train DistilBERT (alternative, higher-quality model)
+```bash
+pip install -r requirements.txt  # ensure transformers/torch installed
+python3 train_distilbert.py --csv hotel_reviews.csv --model-name distilbert-base-uncased --epochs 3 --batch-size 16
+```
+- HF model saved to `artifacts/hotel_sentiment_distilbert/` (includes tokenizer + model)
+- Reports saved to `reports/` (classification report, confusion matrix)
+
 ### Run the app (single text input)
 ```bash
 python3 -m streamlit run app.py
 ```
 
 ### Files
-- `train.py` — trains and evaluates the model
-- `app.py` — Streamlit app for single review prediction
+- `train.py` — trains and evaluates the TF-IDF + Logistic Regression model
+- `train_distilbert.py` — fine-tunes DistilBERT for 3-class sentiment
+- `app.py` — Streamlit app for single review prediction (auto-loads HF model if present)
 - `hotel_reviews.csv` — data (needs columns: `Review`, `Rating`)
 - `reports/` — evaluation outputs
 - `artifacts/` — saved model
